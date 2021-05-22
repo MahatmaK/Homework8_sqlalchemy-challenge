@@ -51,8 +51,8 @@ def home():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
-        f"/api/v1.0/<start>/<end>")
+        f"/api/v1.0/mm-dd-yyyy <- start date only<br/>"
+        f"/api/v1.0/mm-dd-yyyy/mm-dd-yyyy <- start and end date")
 
 
 
@@ -130,5 +130,51 @@ def tobs():
 
     return jsonify(tobs_tuple) 
 
+
+#Define what to do when a user hits the /api/v1.0/<start>
+@app.route("/api/v1.0/<start>")
+def start_only(start):
+    
+    dt_date = dt.datetime.strptime(start, "%m-%d-%Y")
+
+    session = Session(engine)
+
+    sel = [func.min(Measurement.tobs), 
+        func.max(Measurement.tobs), 
+        func.avg(Measurement.tobs)]
+
+    #Pull values where station is most active station    
+    tobs_query = session.query(*sel).\
+        filter(Measurement.date >= dt_date - dt.timedelta(days=1)).all()
+    
+    session.close()
+
+    tobs_stats = list(np.ravel(tobs_query))
+
+    return jsonify(tobs_stats) 
+
+
+@app.route("/api/v1.0/<start>/<end>")
+def start_and_end(start, end):
+    
+    dt_date_start = dt.datetime.strptime(start, "%m-%d-%Y")
+    dt_date_end = dt.datetime.strptime(end, "%m-%d-%Y")
+
+    session = Session(engine)
+
+    sel = [func.min(Measurement.tobs), 
+        func.max(Measurement.tobs), 
+        func.avg(Measurement.tobs)]
+
+    #Pull values where station is most active station    
+    tobs_query2 = session.query(*sel).\
+        filter(Measurement.date >= dt_date_start - dt.timedelta(days=1)).\
+        filter(Measurement.date <= dt_date_end).all()
+    
+    session.close()
+
+    tobs_stats2 = list(np.ravel(tobs_query2))
+
+    return jsonify(tobs_stats2) 
 if __name__ == "__main__":
     app.run(debug=True)
