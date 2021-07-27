@@ -1,1 +1,2 @@
-This is homework repository for Homework 8 - SQL Alchemy
+# SQL Alchemy
+This is a repository for an SQL Alchemy project
