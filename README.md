@@ -1,4 +1,4 @@
-<h1 align="center"> SQL Alchemy </h1>
+<h1 align="center"> Climate Analysis </h1>
 
 I used Hawaii climate data (hawaii.sqlite) to create plots of the precipitation and temperature of Hawaii using Matplotlib. 
 
